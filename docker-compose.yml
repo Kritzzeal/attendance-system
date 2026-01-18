@@ -1,0 +1,35 @@
+# docker-compose.yml
+services:
+  backend:
+    build: .
+    container_name: attendance-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # SQLite database path
+      SQLITE_DB_PATH: /app/data/attendance.db
+      
+      # Application settings
+      SECRET_KEY: "your-secret-key-change-this"
+      ENVIRONMENT: "production"
+      ALLOWED_ORIGINS: "*"
+      
+      # Remove WhatsApp config since you don't need it
+      # FAST2SMS_API_KEY: ""
+      # WHATSAPP_PHONE_NUMBER_ID: ""
+      
+    volumes:
+      # Persist SQLite database
+      - ./data:/app/data
+      
+      # Optional: Mount logs
+      - ./logs:/app/logs
+      
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
