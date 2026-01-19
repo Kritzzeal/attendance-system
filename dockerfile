@@ -1,4 +1,3 @@
-# Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -9,18 +8,14 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install
-COPY requirements.txt .
+# Copy ALL files first (including requirements.txt)
+COPY . .
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application
-COPY app/ ./app/
-
 # Create data directory for SQLite
-RUN mkdir -p /app/data
-
-# Set Python path
-ENV PYTHONPATH=/app
+RUN mkdir -p /app/data && chmod 755 /app/data
 
 # Create non-root user for security
 RUN useradd -m -u 1000 fastapi && \
@@ -28,7 +23,9 @@ RUN useradd -m -u 1000 fastapi && \
 
 USER fastapi
 
-EXPOSE 8000
+# Use Railway's PORT environment variable
+ENV PORT=8080
+EXPOSE $PORT
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application with Railway's port
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-8080}"]
