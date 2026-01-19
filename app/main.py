@@ -26,6 +26,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://attendance-system-frontend-production.up.railway.app",
         "http://localhost:3000",  # React dev server
         "http://127.0.0.1:3000",
         "http://localhost:5173",  # Vite dev server
